@@ -10,13 +10,12 @@ from widowx_envs.control_loops import TimedLoop
 from widowx_envs.policies.vr_teleop_policy import VRTeleopPolicy
 
 env_params = {
-    'camera_topics': [IMTopic('/cam0/image_raw')],
+    'camera_topics': [IMTopic('/camera0/image_raw')],
     # 'camera_topics': [IMTopic('/cam0/image_raw'), IMTopic('/cam1/image_raw'), IMTopic('/cam2/image_raw')],
     # 'camera_topics': [IMTopic('/cam0/image_raw'), IMTopic('/cam1/image_raw'), IMTopic('/cam2/image_raw'), IMTopic('/cam3/image_raw')],
     'gripper_attached': 'custom',
     'skip_move_to_neutral': True,
     'move_to_rand_start_freq': -1,
-    # 'action_mode':'3trans3rot',
     'fix_zangle': 0.1,
     'move_duration': 0.2,
     'override_workspace_boundaries': [[0.198, -0.038, 0.026, -1.57, 0], [0.320, 0.034, 0.1,  1.57, 0]],
@@ -31,8 +30,6 @@ agent = {
     'T': 300,
     'image_height': 480,
     'image_width': 640,
-    # 'image_height': 96,
-    # 'image_width': 128,
     'make_final_gif': False,
     'video_format': 'mp4',
 }
@@ -51,6 +48,4 @@ config = {
     # 'save_data': True,
     'save_format': ['raw'],
     'make_diagnostics': True
-# [180.23001099 879.63000488 505.72000122 139.88000488  78.01000214
-#  145.26000977]
 }

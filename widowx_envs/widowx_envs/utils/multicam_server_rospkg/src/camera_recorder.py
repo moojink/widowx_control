@@ -2,7 +2,6 @@ import numpy as np
 import rospy
 import os
 from threading import Lock, Semaphore
-from cv_bridge import CvBridge
 import cv2
 from sensor_msgs.msg import Image as Image_msg
 from sensor_msgs.msg import CameraInfo
@@ -51,7 +50,6 @@ class CameraRecorder:
         if self._tracking_enabled:
             self.box_height = 80
 
-        self.bridge = CvBridge()
         self._is_first_status, self._status_sem = True, Semaphore(value=0)
         self._cam_height, self._cam_width = None, None
         self._last_hash, self._num_repeats = None, 0
@@ -174,7 +172,7 @@ class CameraRecorder:
         latest_obsv.img_msg = data
         latest_obsv.tstamp_img = data.header.stamp
 
-        cv_image = self.bridge.imgmsg_to_cv2(data, self._image_dtype)
+        cv_image = np.frombuffer(data.data, dtype=np.uint8).reshape(data.height, data.width, -1)
         if len(cv_image.shape) > 2 and cv_image.shape[2] > 3:
             cv_image = cv_image[:, :, :3]
         latest_obsv.img_cv2 = copy.deepcopy(self._topic_data.process_image(cv_image))

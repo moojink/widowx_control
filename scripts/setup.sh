@@ -9,5 +9,5 @@ fi
 
 cd
 if [ ! -f ".built" ]; then
-    cd ~/interbotix_ws && catkin_make && touch ~/.built
+    cd /iris/u/moojink/interbotix_ws && catkin_make && touch ~/.built
 fi
