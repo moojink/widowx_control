@@ -120,7 +120,7 @@ class BaseRobotEnv2(BaseEnv):
                         'adaptive_wait': True,
                         'workspace_rotation_angle_z': 0,
                         'wait_until_gripper_pose_reached': False,
-                        'catch_environment_except': False,
+                        'catch_environment_except': True,
                         'gripper_params': AttrDict(
                             des_pos_max=1,
                             des_pos_min=0,
@@ -197,6 +197,7 @@ class BaseRobotEnv2(BaseEnv):
                   -keys corresponding to numpy arrays should have constant shape every timestep (for caching)
                   -images should be placed in the 'images' key in a (ncam, ...) array
         """
+        assert not blocking
         assert action.shape[0] == self._base_adim, "Action should have shape ({},) but has shape {}".format(self._base_adim, action.shape)
         action = np.clip(action, self.action_space.low, self.action_space.high)
         if self._hp.action_mode == '3trans1rot':
@@ -224,8 +225,15 @@ class BaseRobotEnv2(BaseEnv):
         if self._hp.catch_environment_except:
             try:
                 self.controller.move_to_eep(new_transform, duration=self._hp.move_duration, blocking=blocking)
-            except:
+            except Environment_Exception:
+                # If Environment_Exception is thrown by the WidowX_Controller class, this means that the robot
+                # likely got stuck, exerted "max effort," and reset itself. We have to ensure that the robot's
+                # belief of its current transform is also reset via `self._reset_previous_qpos()`. Otherwise,
+                # the robot will quickly rush back into the transform that it was at before the reset, and
+                # it will likely slam the environment in the process, which is dangerous.
                 self.move_except = True
+                self._reset_previous_qpos()
+                return
         else:
             self.controller.move_to_eep(new_transform, duration=self._hp.move_duration, blocking=blocking)
 
