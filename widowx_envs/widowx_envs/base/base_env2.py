@@ -197,7 +197,6 @@ class BaseRobotEnv2(BaseEnv):
                   -keys corresponding to numpy arrays should have constant shape every timestep (for caching)
                   -images should be placed in the 'images' key in a (ncam, ...) array
         """
-        assert not blocking
         assert action.shape[0] == self._base_adim, "Action should have shape ({},) but has shape {}".format(self._base_adim, action.shape)
         action = np.clip(action, self.action_space.low, self.action_space.high)
         if self._hp.action_mode == '3trans1rot':

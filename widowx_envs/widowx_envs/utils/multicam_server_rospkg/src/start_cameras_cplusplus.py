@@ -131,7 +131,7 @@ def main(args):
             cam_name = 'cam{}'.format(i*2)
             print(base_call.format(provider, cam_name, visualize_str))
             os.system(base_call.format(provider, cam_name, visualize_str))
-            time.sleep(5)
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':

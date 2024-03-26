@@ -60,6 +60,7 @@ class WidowXEnv(BaseRobotEnv2):
 
         self._reset_previous_qpos()
         obs = self._get_obs()
+        print(f'After reset, current pose is:\n{self.controller.get_cartesian_pose(matrix=True)}')
         return obs
 
     def move_to_startstate(self, start_state=None):

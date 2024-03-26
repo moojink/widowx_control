@@ -55,6 +55,37 @@ class ModifiedInterbotixArmXSInterface(InterbotixArmXSInterface):
         super(ModifiedInterbotixArmXSInterface, self).__init__(*args, **kwargs)
         self.waist_index = self.group_info.joint_names.index("waist")
 
+    def set_ee_pose_matrix(self, T_sd, custom_guess=None, execute=True, moving_time=None, accel_time=None, blocking=True):
+        if (custom_guess is None):
+            initial_guesses = self.initial_guesses
+        else:
+            initial_guesses = [custom_guess]
+
+        for guess in initial_guesses:
+            theta_list, success = mr.IKinSpace(self.robot_des.Slist, self.robot_des.M, T_sd, guess, 0.001, 0.001)
+            solution_found = True
+
+            # Check to make sure a solution was found and that no joint limits were violated
+            if success:
+                theta_list = [int(elem * 1000)/1000.0 for elem in theta_list]
+                for x in range(self.group_info.num_joints):
+                    if not (self.group_info.joint_lower_limits[x] <= theta_list[x] <= self.group_info.joint_upper_limits[x]):
+                        solution_found = False
+                        break
+            else:
+                solution_found = False
+
+            if solution_found:
+                if execute:
+                    self.publish_positions(theta_list, moving_time, accel_time, blocking)
+                    self.T_sb = T_sd
+                return theta_list, True
+            else:
+                rospy.loginfo("Guess failed to converge...")
+
+        rospy.loginfo("No valid pose could be found")
+        return theta_list, False
+
     def set_ee_pose_matrix_fast(self, T_sd, custom_guess=None, execute=True):
         """
         this version of set_ee_pose_matrix does not set the velocity profie registers in the servos and therefore runs faster
@@ -171,7 +202,6 @@ class WidowX_Controller(RobotController):
             self.move_to_neutral()
 
     def move_to_starteep(self, target_pose, duration=1.5, blocking=True, check_effort=True):
-        print('moving to start eep...')
         solution, success = self.bot.arm.set_ee_pose_matrix_fast(target_pose,
                                                                      custom_guess=self.get_joint_angles(),
                                                                      execute=False)
@@ -209,19 +239,6 @@ class WidowX_Controller(RobotController):
             self.move_to_neutral()
             raise Environment_Exception
 
-    # def move_to_neutral(self, duration=4):
-    #     print('moving to neutral..')
-    #     try:
-    #         self.bot.arm.publish_positions(self.neutral_joint_angles, moving_time=duration)
-    #         # print("Error in neutral position", np.linalg.norm(self.neutral_joint_angles - self.get_joint_angles()))
-    #         # import ipdb; ipdb.set_trace()
-    #         if np.linalg.norm(self.neutral_joint_angles - self.get_joint_angles()) > 0.1:
-    #             print("moving to neutral failed!")
-    #             self.check_motor_status_and_reboot()
-    #     except rospy.service.ServiceException:
-    #         print('stuck during reset')
-    #         import pdb; pdb.set_trace()
-
     def move_to_neutral(self, duration=4):
         print('moving to neutral..')
         rospy.sleep(0.1)
@@ -245,12 +262,13 @@ class WidowX_Controller(RobotController):
                     # self.move_to_neutral()
                     # rospy.sleep(1.0)
                     # self.move_to_neutral()
-
             if np.linalg.norm(self.neutral_joint_angles - self.get_joint_angles()) > 0.1:
                 print("moving to neutral failed!")
                 self.check_motor_status_and_reboot()
                 rospy.sleep(1)
                 self.move_to_neutral()
+            else:
+                print('moving to neutral complete')
         except rospy.service.ServiceException:
             print('stuck during reset')
             import pdb;

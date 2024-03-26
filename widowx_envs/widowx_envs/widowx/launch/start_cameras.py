@@ -75,21 +75,21 @@ def main(args):
             provider = '/dev/video{}'.format(dev_number)
             os.system(base_call.format(provider, topic_name, visualize_str))
             print(base_call.format(provider, topic_name, visualize_str))
-            time.sleep(5)
+            time.sleep(0.5)
         return
 
     if args.ncam == -1:
         for provider, cam_name in zip(args.cam_order, args.topic_names):
             provider = '/dev/video{}'.format(provider)
             os.system(base_call.format(provider, cam_name, visualize_str))
-            time.sleep(2)
+            time.sleep(0.2)
     else:
         for i in range(0, args.ncam):
             provider = '/dev/video{}'.format(i*2)
             cam_name = 'cam{}'.format(i*2)
             print(base_call.format(provider, cam_name, visualize_str))
             os.system(base_call.format(provider, cam_name, visualize_str))
-            time.sleep(5)
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':
