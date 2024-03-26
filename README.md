@@ -13,7 +13,7 @@ Clone the `widowx_control` repo for the Bridge WidowX control stack:
 git clone https://github.com/moojink/widowx_control.git
 ```
 
-Create a bash source file (.widowx_profile) with the following contents, replacing all `/PATH/TO/YOUR` with your own base directories:
+Create a bash source file (`.widowx_profile`) with the following contents, replacing all `/PATH/TO/YOUR` with your own base directories:
 ```bash
 # For ROS Noetic environment variables
 source /opt/ros/noetic/setup.bash
