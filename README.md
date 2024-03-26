@@ -28,6 +28,13 @@ export PYTHONPATH="${PYTHONPATH}:/PATH/TO/YOUR/interbotix_ws/src/interbotix_ros_
 export PYTHONPATH="/PATH/TO/YOUR/catkin_ws/devel/lib/python3/dist-packages:${PYTHONPATH}"
 ```
 
+Change the path to `interbotix_ws` in `widowx_control/scripts/setup.sh` as well:
+```bash
+if [ ! -f ".built" ]; then
+    cd /PATH/TO/YOUR/interbotix_ws && catkin_make && touch ~/.built
+fi
+```
+
 On `iris-ws-18`, run the following commands to launch the WidowX controller (built on ROS):
 
 ```
