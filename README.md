@@ -1,11 +1,24 @@
 # Running WidowX with Controller from Bridge Dataset
 
-## Launching Playground Environment
+Note: All instructions below are for `iris-ws-18` specifically!
+
+## Setup
 
 Copy Moo Jin's installed ROS and InterbotiX packages to your own directory:
 ```bash
 rsync -a /iris/u/moojink/interbotix_ws <DESTINATION> -v --progress
 rsync -a /iris/u/moojink/catkin_ws <DESTINATION> -v --progress
+```
+
+Delete the `devel` and `build` folders in both `interbotix_ws` and `catkin_ws` and recompile the source via `catkin_make` in both directories:
+```bash
+cd /PATH/TO/YOUR/interbotix_ws
+rm -rf build devel
+catkin_make
+
+cd /PATH/TO/YOUR/catkin_ws
+rm -rf build devel
+catkin_make
 ```
 
 Clone the `widowx_control` repo for the Bridge WidowX control stack:
@@ -28,14 +41,16 @@ export PYTHONPATH="${PYTHONPATH}:/PATH/TO/YOUR/interbotix_ws/src/interbotix_ros_
 export PYTHONPATH="/PATH/TO/YOUR/catkin_ws/devel/lib/python3/dist-packages:${PYTHONPATH}"
 ```
 
-Change the path to `interbotix_ws` in `widowx_control/scripts/setup.sh` as well:
-```bash
+Go into `widowx_control/scripts/setup.sh` and modify the line containing the path to `interbotix_ws` such that it points to your own `interbotix_ws` directory:
+```python
 if [ ! -f ".built" ]; then
-    cd /PATH/TO/YOUR/interbotix_ws && catkin_make && touch ~/.built
+    cd /PATH/TO/YOUR/interbotix_ws && catkin_make && touch ~/.built  # CHANGE ME
 fi
 ```
 
-On `iris-ws-18`, run the following commands to launch the WidowX controller (built on ROS):
+## Launching Playground Environment
+
+On `iris-ws-18`, run the following commands to launch the WidowX controller:
 
 ```
 cd widowx_control
